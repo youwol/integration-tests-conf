@@ -1,0 +1,23 @@
+{
+    "policies": {
+        "default": "int_tests_yw-users@test-user"
+    },
+    "users": {
+        "int_tests_yw-users@test-user": {
+            "id": "51c42384-3582-494f-8c56-7405b01646ad",
+            "name": "int_tests_yw-users@test-user",
+            "memberOf": [
+                "/youwol-users"
+            ],
+            "email": "int_tests_yw-users@test-user"
+        },
+        "int_tests_yw-users_bis@test-user": {
+            "id": "eea5c7c0-040c-45f2-8688-d9b90f4196ef",
+            "name": "int_tests_yw-users_bis@test-user",
+            "memberOf": [
+                "/youwol-users"
+            ],
+            "email": "int_tests_yw-users_bis@test-user"
+        }
+    }
+}

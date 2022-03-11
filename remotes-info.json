@@ -1,0 +1,13 @@
+{   "policies": {
+        "default": "gc.platform.youwol.com"
+    },
+    "remotes": {
+        "gc.platform.youwol.com":{
+            "host": "gc.platform.youwol.com",
+            "name":"gc",
+            "metadata": {
+                "keycloakClientId":"public-dev"
+            }
+        }
+    }
+}
