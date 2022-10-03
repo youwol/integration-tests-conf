@@ -1,12 +1,37 @@
 {   "policies": {
-        "default": "gc.platform.youwol.com"
+        "default": "platform.youwol.com"
     },
     "remotes": {
-        "gc.platform.youwol.com":{
-            "host": "gc.platform.youwol.com",
-            "name":"gc",
+        "platform.youwol.com": {
+            "host": "platform.youwol.com",
+            "name": "production server",
             "metadata": {
-                "keycloakClientId":"public-dev"
+                "keycloakClientId": "public-dev"
+            },
+            "openidBaseUrl": "https://platform.youwol.com/auth/realms/youwol",
+            "openidClient": {
+                "client_id": "tbd_test_openid_connect_js"
+            },
+            "keycloakAdminBaseUrl": "https://platform.youwol.com/auth/admin/realms/youwol",
+            "adminClient": {
+                "client_id": "admin-cli",
+                "client_secret": "Bi3OlTGzmPvxcGafJvDEHFTkumR3fYF1"
+            }
+        },
+        "platform.dev.youwol.com": {
+            "host": "platform.dev.youwol.com",
+            "name": "dev. server",
+            "metadata": {
+                "keycloakClientId": "public-dev"
+            },
+            "openidBaseUrl": "https://platform.dev.youwol.com/auth/realms/youwol",
+            "openidClient": {
+                "client_id": "tbd_test_openid_connect_js"
+            },
+            "keycloakAdminBaseUrl": "https://platform.dev.youwol.com/auth/admin/realms/youwol",
+            "adminClient": {
+                "client_id": "admin-cli",
+                "client_secret": "Bi3OlTGzmPvxcGafJvDEHFTkumR3fYF1"
             }
         }
     }
