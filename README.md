@@ -1,2 +1,4 @@
 # integrations-test-conf
-Configuration for integration testing with py-youwol
+
+Usual configuration for integration testing with [py-youwol](https://l.youwol.com/doc/py-youwol).
+
