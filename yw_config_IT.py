@@ -6,7 +6,8 @@ from starlette.middleware.base import RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
 
-from youwol.configuration.config_from_module import IConfigurationFactory, Configuration
+from youwol.configuration.models_config import Projects
+from youwol.environment.config_from_module import IConfigurationFactory, Configuration
 from youwol.environment.youwol_environment import YouwolEnvironment
 from youwol.middlewares.models_dispatch import AbstractDispatch
 from youwol.routers.custom_commands.models import Command
@@ -63,7 +64,9 @@ class ConfigurationFactory(IConfigurationFactory):
             httpPort=2001,
             dataDir=Path(__file__).parent / 'databases',
             cacheDir=Path(__file__).parent / 'youwol_system',
-            projectsDirs=[Path(__file__).parent / 'projects'],
+            projects=Projects(
+                finder=Path(__file__).parent / 'projects'
+            ),
             dispatches=[
                 BrotliDecompress()
             ],
