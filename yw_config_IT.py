@@ -10,7 +10,6 @@ from youwol.configuration.config_from_module import IConfigurationFactory, Confi
 from youwol.environment.youwol_environment import YouwolEnvironment
 from youwol.middlewares.models_dispatch import AbstractDispatch
 from youwol.routers.custom_commands.models import Command
-from youwol_utils import decode_id
 from youwol_utils.context import Context
 from youwol.main_args import MainArguments
 from youwol_utils.request_info_factory import url_match
@@ -32,29 +31,29 @@ class BrotliDecompress(AbstractDispatch):
 
     async def apply(self, incoming_request: Request, call_next: RequestResponseEndpoint, context: Context):
 
-        match_cdn, params = url_match(incoming_request, "GET:/api/assets-gateway/raw/package/*/**")
-        env = await context.get('env', YouwolEnvironment)
-        if match_cdn and len(params) > 0 and decode_id(params[0]) in env.portsBook:
+        async with context.start(action="Apply BrotliDecompress") as ctx: # type: Context
+            match_cdn, params = url_match(incoming_request, "GET:/api/assets-gateway/raw/package/*/**")
+            await ctx.info(text="parameters", data={"matchCdn": match_cdn, "params": params})
+
+            match_files, _ = url_match(incoming_request, "GET:/api/assets-gateway/files-backend/files/*")
+            if match_cdn or match_files:
+                response = await call_next(incoming_request)
+                await ctx.info(text="apply brotli decompression on response")
+                if response.headers.get('content-encoding') != 'br':
+                    return response
+
+                await context.info("Apply brotli decompression")
+                binary = b''
+                # noinspection PyUnresolvedReferences
+                async for data in response.body_iterator:
+                    binary += data
+                headers = {k: v for k, v in response.headers.items()
+                           if k not in ['content-length', 'content-encoding']}
+                decompressed = brotli.decompress(binary)
+                resp = Response(decompressed.decode('utf8'), headers=headers)
+                return resp
+
             return None
-
-        match_files, _ = url_match(incoming_request, "GET:/api/assets-gateway/files-backend/files/*")
-        if match_cdn or match_files:
-            response = await call_next(incoming_request)
-            if response.headers.get('content-encoding') != 'br':
-                return response
-
-            await context.info("Apply brotli decompression")
-            binary = b''
-            # noinspection PyUnresolvedReferences
-            async for data in response.body_iterator:
-                binary += data
-            headers = {k: v for k, v in response.headers.items()
-                       if k not in ['content-length', 'content-encoding']}
-            decompressed = brotli.decompress(binary)
-            resp = Response(decompressed.decode('utf8'), headers=headers)
-            return resp
-
-        return None
 
 
 class ConfigurationFactory(IConfigurationFactory):
