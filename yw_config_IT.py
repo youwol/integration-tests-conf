@@ -7,11 +7,10 @@ from starlette.middleware.base import RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
 
-from youwol.environment import Projects, IConfigurationFactory, Configuration, YouwolEnvironment, \
+from youwol.environment import Projects, Command, Configuration, YouwolEnvironment, \
     System, CloudEnvironments, LocalEnvironment, Customization, \
     CustomMiddleware, CustomEndPoints, DirectAuth, CloudEnvironment, get_standard_auth_provider, Connection
-from youwol.main_args import MainArguments
-from youwol.routers.custom_commands.models import Command
+
 from youwol_utils.context import Context, Label
 
 
@@ -74,33 +73,29 @@ prod_env = CloudEnvironment(
     authentications=direct_auths
 )
 
-
-class ConfigurationFactory(IConfigurationFactory):
-
-    async def get(self, main_args: MainArguments) -> Configuration:
-        return Configuration(
-            system=System(
-                httpPort=2001,
-                cloudEnvironments=CloudEnvironments(
-                    defaultConnection=Connection(envId='prod', authId=direct_auths[0].authId),
-                    environments=[prod_env]
-                ),
-                localEnvironment=LocalEnvironment(
-                    dataDir=Path(__file__).parent / 'databases',
-                    cacheDir=Path(__file__).parent / 'youwol_system',)
-            ),
-            projects=Projects(
-                finder=Path(__file__).parent / 'projects'
-            ),
-            customization=Customization(
-                middlewares=[
-                    BrotliDecompressMiddleware()
-                ],
-                endPoints=CustomEndPoints(
-                    commands=[Command(
-                        name="reset",
-                        do_get=lambda ctx: reset(ctx)
-                    )]
-                )
-            )
+Configuration(
+    system=System(
+        httpPort=2001,
+        cloudEnvironments=CloudEnvironments(
+            defaultConnection=Connection(envId='prod', authId=direct_auths[0].authId),
+            environments=[prod_env]
+        ),
+        localEnvironment=LocalEnvironment(
+            dataDir=Path(__file__).parent / 'databases',
+            cacheDir=Path(__file__).parent / 'youwol_system',)
+    ),
+    projects=Projects(
+        finder=Path(__file__).parent / 'projects'
+    ),
+    customization=Customization(
+        middlewares=[
+            BrotliDecompressMiddleware()
+        ],
+        endPoints=CustomEndPoints(
+            commands=[Command(
+                name="reset",
+                do_get=lambda ctx: reset(ctx)
+            )]
         )
+    )
+)
