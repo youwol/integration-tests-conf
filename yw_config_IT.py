@@ -7,9 +7,9 @@ from starlette.middleware.base import RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
 
-from youwol.environment import Projects, IConfigurationFactory, Configuration, YouwolEnvironment, Impersonation, \
-    System, CloudEnvironments, ImpersonateAuthConnection, get_standard_youwol_cloud, LocalEnvironment, Customization, \
-    CustomMiddleware, CustomEndPoints
+from youwol.environment import Projects, IConfigurationFactory, Configuration, YouwolEnvironment, \
+    System, CloudEnvironments, LocalEnvironment, Customization, \
+    CustomMiddleware, CustomEndPoints, DirectAuth, CloudEnvironment, get_standard_auth_provider, Connection
 from youwol.main_args import MainArguments
 from youwol.routers.custom_commands.models import Command
 from youwol_utils.context import Context, Label
@@ -60,25 +60,30 @@ class BrotliDecompressMiddleware(CustomMiddleware):
             return resp
 
 
+users = [
+    (os.getenv("USERNAME_INTEGRATION_TESTS"), os.getenv("PASSWORD_INTEGRATION_TESTS")),
+    (os.getenv("USERNAME_INTEGRATION_TESTS_BIS"), os.getenv("PASSWORD_INTEGRATION_TESTS_BIS"))
+]
+direct_auths = [DirectAuth(authId=email, userName=email, password=pwd)
+                for email, pwd in users]
+
+prod_env = CloudEnvironment(
+    envId="prod",
+    host="platform.youwol.com",
+    authProvider=get_standard_auth_provider("platform.youwol.com"),
+    authentications=direct_auths
+)
+
+
 class ConfigurationFactory(IConfigurationFactory):
 
     async def get(self, main_args: MainArguments) -> Configuration:
-        host = "platform.youwol.com"
-        users = [
-            (os.getenv("USERNAME_INTEGRATION_TESTS"), os.getenv("PASSWORD_INTEGRATION_TESTS")),
-            (os.getenv("USERNAME_INTEGRATION_TESTS_BIS"), os.getenv("PASSWORD_INTEGRATION_TESTS_BIS"))
-        ]
-        impersonations = [Impersonation(userId=email, userName=email, password=pwd, forHosts=[host])
-                          for email, pwd in users]
         return Configuration(
             system=System(
                 httpPort=2001,
                 cloudEnvironments=CloudEnvironments(
-                    defaultConnection=ImpersonateAuthConnection(host=host, userId=users[0][0]),
-                    environments=[
-                        get_standard_youwol_cloud(host=host),
-                    ],
-                    impersonations=impersonations
+                    defaultConnection=Connection(envId='prod', authId=direct_auths[0].authId),
+                    environments=[prod_env]
                 ),
                 localEnvironment=LocalEnvironment(
                     dataDir=Path(__file__).parent / 'databases',
