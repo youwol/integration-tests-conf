@@ -2,3 +2,4 @@ __pycache__
 youwol_system
 databases
 projects
+*.iml
