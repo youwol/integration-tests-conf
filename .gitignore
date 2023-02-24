@@ -3,3 +3,4 @@ youwol_system
 databases
 projects
 *.iml
+.env
