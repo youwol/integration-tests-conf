@@ -7,11 +7,11 @@ from starlette.middleware.base import RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
 
-from youwol.environment import Projects, Command, Configuration, YouwolEnvironment, \
+from youwol.app.environment import Projects, Command, Configuration, YouwolEnvironment, \
     System, CloudEnvironments, LocalEnvironment, Customization, \
     CustomMiddleware, CustomEndPoints, DirectAuth, CloudEnvironment, get_standard_auth_provider, Connection
 
-from youwol_utils.context import Context, Label
+from youwol.utils.context import Context, Label
 
 
 async def reset(ctx: Context):
